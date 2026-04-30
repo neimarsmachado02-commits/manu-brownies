@@ -155,9 +155,14 @@
         }
 
         .hero-logo {
-            font-size: clamp(3.5rem, 10vw, 6rem);
             margin-bottom: 0.5rem;
-            letter-spacing: -1px;
+            max-width: 300px;
+            height: auto;
+        }
+
+        .footer-logo {
+            max-width: 200px;
+            margin: 0 auto 2rem;
         }
 
         .hero-subtitle {
@@ -529,7 +534,7 @@
     <section class="hero">
         <div class="hero-content reveal">
             <p class="hero-subtitle">Brownies Artesanais</p>
-            <h1 class="hero-logo">Manú-Brownie</h1>
+            <img src="assets/logo.png" alt="Manú-Brownie" class="hero-logo">
             <p class="hero-tagline">"Cada mordida, uma memória."</p>
             <a href="https://wa.me/5551986129532?text=Olá!%20Vi%20o%20site%20da%20Manú-Brownie%20e%20gostaria%20de%20fazer%20um%20pedido." target="_blank" class="btn">Fazer Meu Pedido</a>
         </div>
@@ -690,7 +695,7 @@
     <!-- Footer Section -->
     <footer class="footer">
         <div class="container">
-            <h2 class="hero-logo footer-logo">Manú-Brownie</h2>
+            <img src="assets/logo.png" alt="Manú-Brownie" class="hero-logo footer-logo">
             <div class="social-links">
                 <a href="#" aria-label="Instagram">
                     <svg class="social-icon" viewBox="0 0 24 24">
