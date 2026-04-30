@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manú-Brownies | Cada mordida, uma memória</title>
+    <meta name="description" content="Brownies artesanais de alta qualidade, feitos com afeto e ingredientes selecionados. Sinta o sabor intenso do verdadeiro chocolate.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --chocolate: #3D1F16;
+            --doce-de-leite: #C68E4E;
+            --creme: #F5EBE0;
+            --rosa: #EFB1B1;
+            --white: #FFFFFF;
+            
+            --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow-warm: 0 20px 40px rgba(61, 31, 22, 0.15);
+            --shadow-intense: 0 30px 60px rgba(61, 31, 22, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--creme);
+            color: var(--chocolate);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+        }
+
+        /* Texture Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.04;
+            z-index: 9999;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Reusable Components */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background-color: var(--doce-de-leite);
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 0;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            border-color: var(--doce-de-leite);
+            color: var(--doce-de-leite);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(198, 142, 78, 0.2);
+        }
+
+        .btn-light {
+            background-color: transparent;
+            border: 1px solid var(--creme);
+            color: var(--creme);
+        }
+
+        .btn-light:hover {
+            background-color: var(--creme);
+            color: var(--chocolate);
+        }
+
+        /* Divider */
+        .divider {
+            width: 80px;
+            height: 1px;
+            background-color: var(--doce-de-leite);
+            margin: 2rem 0;
+        }
+
+        .divider-center {
+            margin: 2rem auto;
+        }
+
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            height: 100vh;
+            background-color: var(--chocolate);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--creme);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at center, rgba(198, 142, 78, 0.05) 0%, transparent 70%);
+            top: -25%;
+            left: -25%;
+        }
+
+        .hero-content {
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .hero-logo {
+            font-size: clamp(3.5rem, 10vw, 6rem);
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--doce-de-leite);
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .hero-tagline {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.8rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        /* SOBRE NÓS */
+        .about {
+            padding: 10rem 0;
+            background-color: var(--creme);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/5;
+            background: var(--chocolate);
+            position: relative;
+            box-shadow: var(--shadow-warm);
+            overflow: hidden;
+            padding: 1.5rem; /* Frame thickness */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .about-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .about-image-placeholder:hover img {
+            transform: scale(1.05);
+        }
+
+
+        .about-text {
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--chocolate);
+        }
+
+        .about-p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        /* NOSSOS BROWNIES */
+        .products {
+            padding: 8rem 0;
+            background-color: var(--white);
+        }
+
+        .products-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .product-card {
+            background: var(--creme);
+            padding: 2.5rem;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(61, 31, 22, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-intense);
+        }
+
+        .product-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--doce-de-leite);
+            transition: var(--transition);
+        }
+
+        .product-card:hover::after {
+            width: 100%;
+        }
+
+        .product-visual {
+            width: 100%;
+            aspect-ratio: 1/1;
+            margin: 0 auto 2rem;
+            position: relative;
+            background: var(--chocolate);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+            padding: 1rem; /* Frame thickness for cards */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-visual img {
+            transform: scale(1.1);
+        }
+
+
+        .product-name {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-desc {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+            opacity: 0.8;
+        }
+
+        .product-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--doce-de-leite);
+            margin-bottom: 2rem;
+        }
+
+        /* POR QUE A MANÚ */
+        .features {
+            padding: 8rem 0;
+            background-color: var(--chocolate);
+            color: var(--creme);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4rem;
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 2rem;
+            fill: var(--doce-de-leite);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .feature-text {
+            font-size: 0.95rem;
+            opacity: 0.7;
+        }
+
+        /* DEPOIMENTOS */
+        .testimonials {
+            padding: 8rem 0;
+            background-color: var(--creme);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .testimonial-card {
+            padding: 3rem;
+            background: var(--white);
+            position: relative;
+            box-shadow: var(--shadow-warm);
+        }
+
+        .quote-icon {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            color: var(--doce-de-leite);
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            opacity: 0.3;
+            line-height: 1;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            color: var(--doce-de-leite);
+        }
+
+        /* CTA FINAL */
+        .cta-final {
+            padding: 8rem 0;
+            background-color: var(--doce-de-leite);
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-cta {
+            background-color: var(--chocolate);
+            color: var(--white);
+            padding: 1.5rem 3.5rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-cta:hover {
+            background-color: var(--white);
+            color: var(--chocolate);
+            border-color: var(--white);
+        }
+
+        /* FOOTER */
+        .footer {
+            padding: 5rem 0;
+            background-color: var(--chocolate);
+            color: var(--creme);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .social-icon {
+            width: 24px;
+            height: 24px;
+            fill: var(--creme);
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            fill: var(--doce-de-leite);
+            transform: scale(1.2);
+        }
+
+        .footer-bottom {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            letter-spacing: 1px;
+        }
+
+        /* RESPONSIVENESS */
+        @media (max-width: 992px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            .section-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-logo {
+                font-size: 3rem;
+            }
+            .hero-tagline {
+                font-size: 1.4rem;
+            }
+            .container {
+                padding: 0 1.5rem;
+            }
+        }
+
+        /* Custom Shapes and Decorations */
+        .floating-heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            fill: var(--rosa);
+            opacity: 0.4;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg) scale(var(--size));
+                opacity: 0;
+            }
+            10% {
+                opacity: var(--max-opacity);
+            }
+            90% {
+                opacity: var(--max-opacity);
+            }
+            100% {
+                transform: translateY(110vh) rotate(var(--rotation)) scale(var(--size));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content reveal">
+            <p class="hero-subtitle">Brownies Artesanais</p>
+            <h1 class="hero-logo">Manú-Brownie</h1>
+            <p class="hero-tagline">"Cada mordida, uma memória."</p>
+            <a href="https://wa.me/5551986129532?text=Olá!%20Vi%20o%20site%20da%20Manú-Brownie%20e%20gostaria%20de%20fazer%20um%20pedido." target="_blank" class="btn">Fazer Meu Pedido</a>
+        </div>
+    </section>
+
+    <!-- Sobre Nós Section -->
+    <section class="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image reveal">
+                    <div class="about-image-placeholder">
+                        <img src="public/producao.png" alt="Produção artesanal Manú-Brownie">
+                    </div>
+                </div>
+                <div class="about-text reveal">
+                    <div class="divider"></div>
+                    <h2 class="section-title">O afeto em cada detalhe</h2>
+                    <p class="about-p">Na Manú-Brownies, acreditamos que a doçura tem o poder de eternizar momentos. Nossa missão é transformar o cotidiano em algo extraordinário através de brownies feitos à mão, com paciência e os melhores ingredientes.</p>
+                    <p class="about-p">Cada receita é um abraço em forma de chocolate, pensada para quem valoriza a autenticidade do sabor artesanal e o carinho da produção familiar.</p>
+                    <a href="#produtos" class="btn" style="background: transparent; border-color: var(--chocolate); color: var(--chocolate);">Conheça nossos sabores</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nossos Brownies Section -->
+    <section id="produtos" class="products">
+        <div class="container">
+            <div class="products-header reveal">
+                <h2 class="section-title">Nossas Criações</h2>
+                <div class="divider divider-center"></div>
+                <p>O equilíbrio perfeito entre o intenso do chocolate e a cremosidade do recheio.</p>
+            </div>
+            
+            <div class="products-grid">
+                <!-- Card 1 -->
+                <div class="product-card reveal">
+                    <div class="product-visual">
+                        <img src="public/O Classico.jpg" alt="Brownie O Clássico">
+                        <div class="brownie-texture-lines"></div>
+                    </div>
+                    <h3 class="product-name">O Clássico</h3>
+                    <p class="product-desc">O brownie que deu início a tudo. Crocante por fora, úmido por dentro.</p>
+                    <p class="product-price">R$ 12,00</p>
+                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20O%20Clássico." target="_blank" class="btn btn-sm">Pedir</a>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="product-card reveal">
+                    <div class="product-visual">
+                        <img src="public/duo nutella.jpg" alt="Brownie Duo Nutella">
+                        <div class="brownie-texture-lines"></div>
+                    </div>
+                    <h3 class="product-name">Duo Nutella</h3>
+                    <p class="product-desc">Nossa massa intensa recheada com uma generosa camada de Nutella original.</p>
+                    <p class="product-price">R$ 16,00</p>
+                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20Duo%20Nutella." target="_blank" class="btn btn-sm">Pedir</a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="product-card reveal">
+                    <div class="product-visual">
+                        <img src="public/Crocante Nozes.png" alt="Brownie Crocante Nozes">
+                        <div class="brownie-texture-lines"></div>
+                    </div>
+                    <h3 class="product-name">Crocante Nozes</h3>
+                    <p class="product-desc">Para quem busca textura. Nozes selecionadas em cada pedaço.</p>
+                    <p class="product-price">R$ 15,00</p>
+                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20Crocante%20Nozes." target="_blank" class="btn btn-sm">Pedir</a>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="product-card reveal">
+                    <div class="product-visual">
+                        <img src="public/red.jpg" alt="Brownie Red Velvet">
+                        <div class="brownie-texture-lines"></div>
+                    </div>
+                    <h3 class="product-name">Red Velvet</h3>
+                    <p class="product-desc">A elegância do veludo vermelho com um toque de cream cheese.</p>
+                    <p class="product-price">R$ 18,00</p>
+                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20Red%20Velvet." target="_blank" class="btn btn-sm">Pedir</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Por que a Manú Section -->
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <!-- Pilar 1 -->
+                <div class="feature-item reveal">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M21,11H19V9h2V11M19,13H21V15H19V13M15,9H17V11H15V9M15,13H17V15H15V13M11,9H13V11H11V9M11,13H13V15H11V13M7,9H9V11H7V9M7,13H9V15H7V13M2,20V4C2,2.89 2.89,2 4,2H20C21.11,2 22,2.89 22,4V20C22,21.11 21.11,22 20,22H4C2.89,22 2,21.11 2,20M4,4V20H6V4H4M8,4V20H10V4H8M12,4V20H14V4H12M16,4V20H18V4H16M20,4V20H21V4H20Z" />
+                    </svg>
+                    <h3 class="feature-title">Ingredientes Selecionados</h3>
+                    <p class="feature-text">Usamos apenas chocolate com alto teor de cacau e manteiga de verdade. Sem conservantes.</p>
+                </div>
+
+                <!-- Pilar 2 -->
+                <div class="feature-item reveal">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
+                    </svg>
+                    <h3 class="feature-title">Feito com Afeto</h3>
+                    <p class="feature-text">Cada fornada é acompanhada de perto para garantir a textura perfeita e o sabor de casa.</p>
+                </div>
+
+                <!-- Pilar 3 -->
+                <div class="feature-item reveal">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M3,4V15H5V6H19V15H21V4H3M3,16V18H21V16H3M5,7V14H19V7H5Z" />
+                        <path d="M20,8L12,13L4,8V10L12,15L20,10V8Z" />
+                    </svg>
+                    <h3 class="feature-title">Entrega Impecável</h3>
+                    <p class="feature-text">Embalagens pensadas para presentear e proteger toda a qualidade do nosso produto.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Depoimentos Section -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="products-header reveal">
+                <h2 class="section-title">Palavras de Carinho</h2>
+                <div class="divider divider-center"></div>
+            </div>
+
+            <div class="testimonial-grid">
+                <div class="testimonial-card reveal">
+                    <span class="quote-icon">“</span>
+                    <p class="testimonial-text">Nunca comi nada igual. A textura é indescritível e você sente o carinho em cada mordida. O de Nutella é meu vício!</p>
+                    <p class="testimonial-author">— Marina Silva</p>
+                </div>
+                <div class="testimonial-card reveal">
+                    <span class="quote-icon">“</span>
+                    <p class="testimonial-text">Presenteei minha mãe com uma caixa e ela ficou encantada. A embalagem é linda e o sabor é de outro mundo.</p>
+                    <p class="testimonial-author">— Ricardo Mendes</p>
+                </div>
+                <div class="testimonial-card reveal">
+                    <span class="quote-icon">“</span>
+                    <p class="testimonial-text">O melhor acompanhamento para o meu café da tarde. O Brownie Clássico tem aquele gosto de infância com sofisticação.</p>
+                    <p class="testimonial-author">— Ana Paula Lima</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final Section -->
+    <section id="pedidos" class="cta-final">
+        <div class="container reveal">
+            <h2 class="cta-title">Pronto para o melhor brownie da sua vida?</h2>
+            <a href="https://wa.me/5551986129532?text=Olá!%20Vi%20o%20site%20da%20Manú-Brownie%20e%20gostaria%20de%20fazer%20um%20pedido." target="_blank" class="btn btn-cta">Pedir pelo WhatsApp</a>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="container">
+            <h2 class="hero-logo footer-logo">Manú-Brownie</h2>
+            <div class="social-links">
+                <a href="#" aria-label="Instagram">
+                    <svg class="social-icon" viewBox="0 0 24 24">
+                        <path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4A3.6,3.6 0 0,0 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6A3.6,3.6 0 0,0 16.4,4H7.6M17.2,7A1.2,1.2 0 1,1 16,8.2A1.2,1.2 0 0,1 17.2,7M12,7A5,5 0 1,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 1,0 15,12A3,3 0 0,0 12,9Z" />
+                    </svg>
+                </a>
+                <a href="#" aria-label="Facebook">
+                    <svg class="social-icon" viewBox="0 0 24 24">
+                        <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z" />
+                    </svg>
+                </a>
+            </div>
+            <p class="footer-bottom">© 2026 Manú-Brownies Artesanais. Feito com afeto.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Reveal Animations on Scroll
+        const observerOptions = {
+            threshold: 0.15
+        };
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            revealObserver.observe(el);
+        });
+
+        // Add falling hearts across all sections for "afeto"
+        function createFallingHearts() {
+            const sections = document.querySelectorAll('section, footer');
+            
+            function spawnHeart(container) {
+                const heart = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                heart.setAttribute("viewBox", "0 0 24 24");
+                heart.classList.add("floating-heart");
+                heart.innerHTML = '<path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />';
+                
+                const size = Math.random() * 0.8 + 0.4;
+                const duration = Math.random() * 10 + 10;
+                const left = Math.random() * 100;
+                const rotation = Math.random() * 360;
+                const maxOpacity = Math.random() * 0.3 + 0.1;
+
+                heart.style.left = left + "%";
+                heart.style.top = "-20px";
+                heart.style.animationDuration = duration + "s";
+                heart.style.setProperty('--size', size);
+                heart.style.setProperty('--rotation', rotation + 'deg');
+                heart.style.setProperty('--max-opacity', maxOpacity);
+                
+                // Random delay
+                heart.style.animationDelay = (Math.random() * -20) + "s";
+                
+                container.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }
+
+            sections.forEach(section => {
+                // Ensure section is relative for absolute positioning
+                section.style.position = 'relative';
+                
+                // Initial batch for each section
+                for(let i = 0; i < 5; i++) {
+                    spawnHeart(section);
+                }
+
+                // Keep spawning in each section
+                setInterval(() => spawnHeart(section), 4000);
+            });
+        }
+        
+        window.addEventListener('load', () => {
+            createFallingHearts();
+            // Trigger first reveal
+            setTimeout(() => {
+                document.querySelector('.hero-content').classList.add('active');
+            }, 300);
+        });
+    </script>
+</body>
+</html>
