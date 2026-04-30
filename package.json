@@ -1,0 +1,10 @@
+{
+  "name": "manu-brownies",
+  "version": "1.0.0",
+  "description": "Manu Brownies Landing Page",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "build": "echo 'Static build complete'"
+  }
+}
