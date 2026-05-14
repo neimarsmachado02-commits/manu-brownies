@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | Manú-Brownies</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/supabase-config.js"></script>
+
+    <style>
+        :root {
+            --chocolate: #3D1F16;
+            --doce-de-leite: #C68E4E;
+            --creme: #F5EBE0;
+            --white: #FFFFFF;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--creme);
+            color: var(--chocolate);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Texture Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.04;
+            z-index: 9999;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+
+        /* Login */
+        #login-section {
+            max-width: 400px;
+            margin: 10rem auto;
+            background: var(--white);
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        /* Dashboard */
+        #admin-dashboard { display: none; }
+
+        header {
+            background: var(--chocolate);
+            color: var(--creme);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--white);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 1rem 2rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: var(--chocolate);
+            opacity: 0.6;
+        }
+        .tab-btn.active {
+            opacity: 1;
+            border-bottom: 3px solid var(--doce-de-leite);
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            font-family: inherit;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--doce-de-leite);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-danger { background: var(--danger); }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            margin-top: 2rem;
+        }
+        .data-table th, .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .data-table th { background: #f9f9f9; font-size: 0.8rem; text-transform: uppercase; }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--white);
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay"></div>
+
+    <section id="login-section">
+        <h2 style="margin-bottom: 2rem;">Acesso Administrativo</h2>
+        <div class="form-group">
+            <input type="email" id="login-email" placeholder="E-mail">
+        </div>
+        <div class="form-group">
+            <input type="password" id="login-password" placeholder="Senha">
+        </div>
+        <button class="btn" onclick="handleLogin()" style="width: 100%;">Entrar</button>
+        <p id="login-error" style="color: var(--danger); margin-top: 1rem; font-size: 0.8rem;"></p>
+    </section>
+
+    <section id="admin-dashboard">
+        <header>
+            <h3>Manú-Brownies Admin</h3>
+            <button class="btn btn-danger" onclick="handleLogout()" style="padding: 0.5rem 1rem; font-size: 0.7rem;">Sair</button>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('products')">Produtos</button>
+            <button class="tab-btn" onclick="showTab('posts')">Blog</button>
+            <button class="tab-btn" onclick="showTab('testimonials')">Depoimentos</button>
+        </div>
+
+        <div class="container">
+            <div id="tab-content">
+                <!-- Content injected here -->
+            </div>
+        </div>
+    </section>
+
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Editar</h3>
+            <div id="modal-form-container"></div>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn" onclick="saveData()">Salvar</button>
+                <button class="btn btn-danger" onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        let currentTab = 'products';
+        let currentEditingId = null;
+
+        window.addEventListener('load', async () => {
+            checkUser();
+        });
+
+        async function checkUser() {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (user) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                loadTabData();
+            }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                email, password
+            });
+
+            if (error) {
+                errorEl.innerText = error.message;
+            } else {
+                checkUser();
+            }
+        }
+
+        async function handleLogout() {
+            await window.supabaseClient.auth.signOut();
+            location.reload();
+        }
+
+        function showTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadTabData();
+        }
+
+        async function loadTabData() {
+            const container = document.getElementById('tab-content');
+            container.innerHTML = '<p>Carregando...</p>';
+
+            const { data, error } = await window.supabaseClient
+                .from(currentTab)
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            let html = `<button class="btn" onclick="openCreateModal()">+ Novo Item</button>`;
+            html += `<table class="data-table"><thead><tr>`;
+            
+            if (currentTab === 'products') {
+                html += `<th>Nome</th><th>Preço</th><th>Ações</th></tr></thead><tbody>`;
+                data.forEach(item => {
+                    html += `<tr><td>${item.name}</td><td>R$ ${item.price}</td>
+                        <td><button onclick="openEditModal('${item.id}')">Editar</button> <button onclick="deleteItem('${item.id}')">Excluir</button></td></tr>`;
+                });
+            } else if (currentTab === 'posts') {
+                html += `<th>Título</th><th>Tipo</th><th>Ações</th></tr></thead><tbody>`;
+                data.forEach(item => {
+                    html += `<tr><td>${item.title}</td><td>${item.type}</td>
+                        <td><button onclick="openEditModal('${item.id}')">Editar</button> <button onclick="deleteItem('${item.id}')">Excluir</button></td></tr>`;
+                });
+            } else {
+                html += `<th>Autor</th><th>Texto</th><th>Ações</th></tr></thead><tbody>`;
+                data.forEach(item => {
+                    html += `<tr><td>${item.author}</td><td>${item.text.substring(0, 30)}...</td>
+                        <td><button onclick="openEditModal('${item.id}')">Editar</button> <button onclick="deleteItem('${item.id}')">Excluir</button></td></tr>`;
+                });
+            }
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function openCreateModal() {
+            currentEditingId = null;
+            document.getElementById('modal-title').innerText = 'Novo Item';
+            renderForm({});
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+
+        async function openEditModal(id) {
+            currentEditingId = id;
+            document.getElementById('modal-title').innerText = 'Editar Item';
+            const { data } = await window.supabaseClient.from(currentTab).select('*').eq('id', id).single();
+            renderForm(data);
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+
+        function renderForm(data) {
+            const container = document.getElementById('modal-form-container');
+            let html = '';
+
+            if (currentTab === 'products') {
+                html = `
+                    <div class="form-group"><label>Nome</label><input id="f-name" value="${data.name || ''}"></div>
+                    <div class="form-group"><label>Descrição</label><textarea id="f-description">${data.description || ''}</textarea></div>
+                    <div class="form-group"><label>Preço</label><input type="number" step="0.01" id="f-price" value="${data.price || ''}"></div>
+                    <div class="form-group">
+                        <label>Imagem (URL ou Upload)</label>
+                        <input id="f-image_url" value="${data.image_url || ''}">
+                        <div style="margin-top: 5px; display: flex; gap: 5px;">
+                            <input type="file" id="up-image" accept="image/*" style="display: none;" onchange="handleFileUpload(this, 'f-image_url')">
+                            <button class="btn" style="padding: 5px 10px; font-size: 0.7rem;" onclick="document.getElementById('up-image').click()">📁 Escolher Foto</button>
+                            <input type="file" id="cap-image" accept="image/*" capture="camera" style="display: none;" onchange="handleFileUpload(this, 'f-image_url')">
+                            <button class="btn" style="padding: 5px 10px; font-size: 0.7rem;" onclick="document.getElementById('cap-image').click()">📸 Tirar Foto</button>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Link WhatsApp</label><input id="f-whatsapp_link" value="${data.whatsapp_link || ''}"></div>
+                `;
+            } else if (currentTab === 'posts') {
+                html = `
+                    <div class="form-group"><label>Título</label><input id="f-title" value="${data.title || ''}"></div>
+                    <div class="form-group"><label>Slug</label><input id="f-slug" value="${data.slug || ''}"></div>
+                    <div class="form-group"><label>Tipo</label>
+                        <select id="f-type">
+                            <option value="article" ${data.type === 'article' ? 'selected' : ''}>Artigo</option>
+                            <option value="recipe" ${data.type === 'recipe' ? 'selected' : ''}>Receita</option>
+                            <option value="menu" ${data.type === 'menu' ? 'selected' : ''}>Cardápio</option>
+                            <option value="curiosity" ${data.type === 'curiosity' ? 'selected' : ''}>Curiosidade</option>
+                            <option value="video" ${data.type === 'video' ? 'selected' : ''}>Vídeo</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Conteúdo</label><textarea id="f-content" rows="10">${data.content || ''}</textarea></div>
+                    <div class="form-group"><label>Resumo</label><input id="f-excerpt" value="${data.excerpt || ''}"></div>
+                    <div class="form-group">
+                        <label>URL da Imagem</label>
+                        <input id="f-image_url" value="${data.image_url || ''}">
+                        <div style="margin-top: 5px; display: flex; gap: 5px;">
+                            <input type="file" id="up-post-image" accept="image/*" style="display: none;" onchange="handleFileUpload(this, 'f-image_url')">
+                            <button class="btn" style="padding: 5px 10px; font-size: 0.7rem;" onclick="document.getElementById('up-post-image').click()">📁 Foto</button>
+                            <input type="file" id="cap-post-image" accept="image/*" capture="camera" style="display: none;" onchange="handleFileUpload(this, 'f-image_url')">
+                            <button class="btn" style="padding: 5px 10px; font-size: 0.7rem;" onclick="document.getElementById('cap-post-image').click()">📸 Camera</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>URL do Vídeo</label>
+                        <input id="f-video_url" value="${data.video_url || ''}">
+                        <div style="margin-top: 5px; display: flex; gap: 5px;">
+                            <input type="file" id="up-video" accept="video/*" style="display: none;" onchange="handleFileUpload(this, 'f-video_url')">
+                            <button class="btn" style="padding: 5px 10px; font-size: 0.7rem;" onclick="document.getElementById('up-video').click()">📁 Vídeo</button>
+                            <input type="file" id="cap-video" accept="video/*" capture="camcorder" style="display: none;" onchange="handleFileUpload(this, 'f-video_url')">
+                            <button class="btn" style="padding: 5px 10px; font-size: 0.7rem;" onclick="document.getElementById('cap-video').click()">📹 Gravar</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="form-group"><label>Autor</label><input id="f-author" value="${data.author || ''}"></div>
+                    <div class="form-group"><label>Texto</label><textarea id="f-text">${data.text || ''}</textarea></div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        async function handleFileUpload(input, targetId) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const targetInput = document.getElementById(targetId);
+            const originalText = targetInput.value;
+            targetInput.value = "Enviando...";
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { data, error } = await window.supabaseClient.storage
+                .from('media')
+                .upload(filePath, file);
+
+            if (error) {
+                alert('Erro no upload: ' + error.message);
+                targetInput.value = originalText;
+            } else {
+                const { data: { publicUrl } } = window.supabaseClient.storage
+                    .from('media')
+                    .getPublicUrl(filePath);
+                
+                targetInput.value = publicUrl;
+            }
+        }
+
+        async function saveData() {
+            const obj = {};
+            if (currentTab === 'products') {
+                obj.name = document.getElementById('f-name').value;
+                obj.description = document.getElementById('f-description').value;
+                obj.price = document.getElementById('f-price').value;
+                obj.image_url = document.getElementById('f-image_url').value;
+                obj.whatsapp_link = document.getElementById('f-whatsapp_link').value;
+            } else if (currentTab === 'posts') {
+                obj.title = document.getElementById('f-title').value;
+                obj.slug = document.getElementById('f-slug').value;
+                obj.type = document.getElementById('f-type').value;
+                obj.content = document.getElementById('f-content').value;
+                obj.excerpt = document.getElementById('f-excerpt').value;
+                obj.image_url = document.getElementById('f-image_url').value;
+                obj.video_url = document.getElementById('f-video_url').value;
+            } else {
+                obj.author = document.getElementById('f-author').value;
+                obj.text = document.getElementById('f-text').value;
+            }
+
+            if (currentEditingId) {
+                const { error } = await window.supabaseClient.from(currentTab).update(obj).eq('id', currentEditingId);
+                if (error) alert(error.message);
+            } else {
+                const { error } = await window.supabaseClient.from(currentTab).insert([obj]);
+                if (error) alert(error.message);
+            }
+
+            closeModal();
+            loadTabData();
+        }
+
+        async function deleteItem(id) {
+            if (confirm('Tem certeza?')) {
+                await window.supabaseClient.from(currentTab).delete().eq('id', id);
+                loadTabData();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        // Expose functions to global scope for onclick handlers
+        window.handleLogin = handleLogin;
+        window.handleLogout = handleLogout;
+        window.showTab = showTab;
+        window.openCreateModal = openCreateModal;
+        window.openEditModal = openEditModal;
+        window.saveData = saveData;
+        window.deleteItem = deleteItem;
+        window.closeModal = closeModal;
+        window.handleFileUpload = handleFileUpload;
+    </script>
+</body>
+</html>

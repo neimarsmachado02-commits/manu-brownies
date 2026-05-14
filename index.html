@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/supabase-config.js"></script>
 
     <style>
         :root {
@@ -536,7 +540,10 @@
             <p class="hero-subtitle">Brownies Artesanais</p>
             <img src="assets/logo.png" alt="Manú-Brownie" class="hero-logo">
             <p class="hero-tagline">"Cada mordida, uma memória."</p>
-            <a href="https://wa.me/5551986129532?text=Olá!%20Vi%20o%20site%20da%20Manú-Brownie%20e%20gostaria%20de%20fazer%20um%20pedido." target="_blank" class="btn">Fazer Meu Pedido</a>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="https://wa.me/5551986129532?text=Olá!%20Vi%20o%20site%20da%20Manú-Brownie%20e%20gostaria%20de%20fazer%20um%20pedido." target="_blank" class="btn">Fazer Meu Pedido</a>
+                <a href="blog.html" class="btn btn-light">Ver Blog</a>
+            </div>
         </div>
     </section>
 
@@ -569,54 +576,9 @@
                 <p>O equilíbrio perfeito entre o intenso do chocolate e a cremosidade do recheio.</p>
             </div>
             
-            <div class="products-grid">
-                <!-- Card 1 -->
-                <div class="product-card reveal">
-                    <div class="product-visual">
-                        <img src="assets/O Classico.jpg" alt="Brownie O Clássico">
-                        <div class="brownie-texture-lines"></div>
-                    </div>
-                    <h3 class="product-name">O Clássico</h3>
-                    <p class="product-desc">O brownie que deu início a tudo. Crocante por fora, úmido por dentro.</p>
-                    <p class="product-price">R$ 12,00</p>
-                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20O%20Clássico." target="_blank" class="btn btn-sm">Pedir</a>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="product-card reveal">
-                    <div class="product-visual">
-                        <img src="assets/duo nutella.jpg" alt="Brownie Duo Nutella">
-                        <div class="brownie-texture-lines"></div>
-                    </div>
-                    <h3 class="product-name">Duo Nutella</h3>
-                    <p class="product-desc">Nossa massa intensa recheada com uma generosa camada de Nutella original.</p>
-                    <p class="product-price">R$ 16,00</p>
-                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20Duo%20Nutella." target="_blank" class="btn btn-sm">Pedir</a>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="product-card reveal">
-                    <div class="product-visual">
-                        <img src="assets/Crocante Nozes.png" alt="Brownie Crocante Nozes">
-                        <div class="brownie-texture-lines"></div>
-                    </div>
-                    <h3 class="product-name">Crocante Nozes</h3>
-                    <p class="product-desc">Para quem busca textura. Nozes selecionadas em cada pedaço.</p>
-                    <p class="product-price">R$ 15,00</p>
-                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20Crocante%20Nozes." target="_blank" class="btn btn-sm">Pedir</a>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="product-card reveal">
-                    <div class="product-visual">
-                        <img src="assets/red.jpg" alt="Brownie Red Velvet">
-                        <div class="brownie-texture-lines"></div>
-                    </div>
-                    <h3 class="product-name">Red Velvet</h3>
-                    <p class="product-desc">A elegância do veludo vermelho com um toque de cream cheese.</p>
-                    <p class="product-price">R$ 18,00</p>
-                    <a href="https://wa.me/5551986129532?text=Olá!%20Gostaria%20de%20pedir%20o%20brownie%20Red%20Velvet." target="_blank" class="btn btn-sm">Pedir</a>
-                </div>
+            <div class="products-grid" id="products-container">
+                <!-- Data will be loaded from Supabase -->
+                <div style="text-align: center; grid-column: 1/-1;">Carregando nossas delícias...</div>
             </div>
         </div>
     </section>
@@ -664,22 +626,8 @@
                 <div class="divider divider-center"></div>
             </div>
 
-            <div class="testimonial-grid">
-                <div class="testimonial-card reveal">
-                    <span class="quote-icon">“</span>
-                    <p class="testimonial-text">Nunca comi nada igual. A textura é indescritível e você sente o carinho em cada mordida. O de Nutella é meu vício!</p>
-                    <p class="testimonial-author">— Marina Silva</p>
-                </div>
-                <div class="testimonial-card reveal">
-                    <span class="quote-icon">“</span>
-                    <p class="testimonial-text">Presenteei minha mãe com uma caixa e ela ficou encantada. A embalagem é linda e o sabor é de outro mundo.</p>
-                    <p class="testimonial-author">— Ricardo Mendes</p>
-                </div>
-                <div class="testimonial-card reveal">
-                    <span class="quote-icon">“</span>
-                    <p class="testimonial-text">O melhor acompanhamento para o meu café da tarde. O Brownie Clássico tem aquele gosto de infância com sofisticação.</p>
-                    <p class="testimonial-author">— Ana Paula Lima</p>
-                </div>
+            <div class="testimonial-grid" id="testimonials-container">
+                <!-- Data will be loaded from Supabase -->
             </div>
         </div>
     </section>
@@ -712,7 +660,7 @@
         </div>
     </footer>
 
-    <script>
+    <script type="module">
         // Reveal Animations on Scroll
         const observerOptions = {
             threshold: 0.15
@@ -781,9 +729,58 @@
             createFallingHearts();
             // Trigger first reveal
             setTimeout(() => {
-                document.querySelector('.hero-content').classList.add('active');
+                const heroContent = document.querySelector('.hero-content');
+                if (heroContent) heroContent.classList.add('active');
             }, 300);
+
+            // Load Supabase Data
+            loadSiteData();
         });
+
+        async function loadSiteData() {
+            if (!window.supabaseClient) return;
+
+            // Load Products
+            const { data: products, error: pError } = await window.supabaseClient
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+            const productsContainer = document.getElementById('products-container');
+            if (products && products.length > 0) {
+                productsContainer.innerHTML = products.map(product => `
+                    <div class="product-card reveal active">
+                        <div class="product-visual">
+                            <img src="${product.image_url}" alt="${product.name}">
+                            <div class="brownie-texture-lines"></div>
+                        </div>
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-desc">${product.description || ''}</p>
+                        <p class="product-price">R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}</p>
+                        <a href="${product.whatsapp_link || '#'}" target="_blank" class="btn btn-sm">Pedir</a>
+                    </div>
+                `).join('');
+            } else {
+                productsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto encontrado.</p>';
+            }
+
+            // Load Testimonials
+            const { data: testimonials, error: tError } = await window.supabaseClient
+                .from('testimonials')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const testimonialsContainer = document.getElementById('testimonials-container');
+            if (testimonials && testimonials.length > 0) {
+                testimonialsContainer.innerHTML = testimonials.map(t => `
+                    <div class="testimonial-card reveal active">
+                        <span class="quote-icon">“</span>
+                        <p class="testimonial-text">${t.text}</p>
+                        <p class="testimonial-author">— ${t.author}</p>
+                    </div>
+                `).join('');
+            }
+        }
     </script>
 </body>
 </html>
